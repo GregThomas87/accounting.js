@@ -56,7 +56,7 @@ this.accounting = 'test';
 	 * from underscore.js
 	 */
 	function isString(obj) {
-		return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
+		return typeof obj === 'string';
 	}
 
 	/**
