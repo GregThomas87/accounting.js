@@ -126,13 +126,25 @@ this.accounting = 'test';
 	/**
 	 * Parses a format string or object and returns format obj for use in rendering
 	 *
-	 * `format` is either a string with the default (positive) format, or object
-	 * containing `pos` (required), `neg` and `zero` values (or a function returning
-	 * either a string or object)
-	 *
-	 * Either string or format.pos must contain "%v" (value) to be valid
+	 * Parameters:
+	 * string    has "default positive format"
+	 * object    has "pos" (required, must contain "%v"), "neg", "zero" properties
+	 * function returns a string or object like above
+	 * 
+	 * Returns:
+	 * object
+	 * 
+	 *  Scenarios:
+	 *  A: Valid String 	=> convert string to a format object
+	 *  B: Invalid String => use default and turn it into an object if it's not already
+	 *  C: Valid Object 	=> return format object
+	 *  D: Invalid Object => returns defaults if it is not a string otherwise set default
+	 *			format to format object
+	 *  E: Function 			=> returns value from function and proceses it as above
+	 *  F: Nothing				=> returns default and turns it into an oject if it's not already
 	 */
 	function checkCurrencyFormat(format) {
+		// Default value with be "%s%v" to start.
 		var defaults = lib.settings.currency.format;
 
 		// Allow function as format parameter (should return string or object):
@@ -144,7 +156,7 @@ this.accounting = 'test';
 			// Create and return positive, negative and zero formats:
 			return {
 				pos : format,
-				neg : format.replace("-", "").replace("%v", "-%v"),
+				neg : format.replace("%v", "-%v"),
 				zero : format
 			};
 
@@ -199,7 +211,7 @@ this.accounting = 'test';
 		var regex = new RegExp("[^0-9-" + decimal + "]", ["g"]),
 			unformatted = parseFloat(
 				("" + value)
-				.replace(/\((?=\d+)(.*)\)/, "-$1") // replace bracketed values with negatives
+				.replace(/\([^\d]*(?=\d+)(.*)\)/, "-$1") // replace bracketed values with negatives
 				.replace(regex, '')         // strip out any cruft
 				.replace(decimal, '.')      // make sure decimal point is standard
 			);
